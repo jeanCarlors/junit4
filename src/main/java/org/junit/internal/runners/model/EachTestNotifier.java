@@ -7,6 +7,7 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.MultipleFailureException;
 
 public class EachTestNotifier {
+
     private final RunNotifier notifier;
 
     private final Description description;
@@ -24,9 +25,13 @@ public class EachTestNotifier {
         }
     }
 
-    private void addMultipleFailureException(MultipleFailureException mfe) {
-        for (Throwable each : mfe.getFailures()) {
-            addFailure(each);
+    public void addFailure(Throwable targetException) {
+        if (targetException instanceof MultipleFailureException) {
+            for (Throwable failure : ((MultipleFailureException) targetException).getFailures()) {
+                addFailure(failure);
+            }
+        } else {
+            fNotifier.fireTestFailure(new Failure(fDescription, targetException));
         }
     }
 
