@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
-
 import org.junit.internal.MethodSorter;
 import org.junit.internal.Throwables;
 
@@ -61,7 +60,7 @@ public class TestSuite implements Test {
                     ((TestCase) test).setName(name);
                 }
             } else {
-                test = constructor.newInstance(new Object[]{name});
+                test = constructor.newInstance(new Object[] { name });
             }
         } catch (InstantiationException e) {
             return (warning("Cannot instantiate test case: " + name + " (" + Throwables.getStacktrace(e) + ")"));
@@ -81,7 +80,7 @@ public class TestSuite implements Test {
         try {
             return theClass.getConstructor(String.class);
         } catch (NoSuchMethodException e) {
-            // fall through
+        // fall through
         }
         return theClass.getConstructor();
     }
@@ -91,6 +90,7 @@ public class TestSuite implements Test {
      */
     public static Test warning(final String message) {
         return new TestCase("warning") {
+
             @Override
             protected void runTest() {
                 fail(message);
@@ -100,7 +100,8 @@ public class TestSuite implements Test {
 
     private String fName;
 
-    private Vector<Test> fTests = new Vector<Test>(10); // Cannot convert this to List because it is used directly by some test runners
+    // Cannot convert this to List because it is used directly by some test runners
+    private Vector<Test> fTests = new Vector<Test>(10);
 
     /**
      * Constructs an empty TestSuite.
@@ -121,17 +122,16 @@ public class TestSuite implements Test {
     private void addTestsFromTestCase(final Class<?> theClass) {
         fName = theClass.getName();
         try {
-            getTestConstructor(theClass); // Avoid generating multiple error messages
+            // Avoid generating multiple error messages
+            getTestConstructor(theClass);
         } catch (NoSuchMethodException e) {
             addTest(warning("Class " + theClass.getName() + " has no public constructor TestCase(String name) or TestCase()"));
             return;
         }
-
         if (!Modifier.isPublic(theClass.getModifiers())) {
             addTest(warning("Class " + theClass.getName() + " is not public"));
             return;
         }
-
         Class<?> superClass = theClass;
         List<String> names = new ArrayList<String>();
         while (Test.class.isAssignableFrom(superClass)) {
@@ -301,8 +301,6 @@ public class TestSuite implements Test {
     }
 
     private boolean isTestMethod(Method m) {
-        return m.getParameterTypes().length == 0 &&
-                m.getName().startsWith("test") &&
-                m.getReturnType().equals(Void.TYPE);
+        return m.getParameterTypes().length == 0 && m.getName().startsWith("test") && m.getReturnType().equals(Void.TYPE);
     }
 }
