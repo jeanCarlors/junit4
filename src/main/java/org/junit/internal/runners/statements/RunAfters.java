@@ -1,44 +1,48 @@
-/**
- * 
- */
 package org.junit.internal.runners.statements;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.internal.runners.model.MultipleFailureException;
 import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 public class RunAfters extends Statement {
-	private final Statement fNext;
+    private final Statement next;
 
-	private final Object fTarget;
+    private final Object target;
 
-	private final List<FrameworkMethod> fAfters;
-	
-	public RunAfters(Statement next, List<FrameworkMethod> afters, Object target) {
-		fNext= next;
-		fAfters= afters;
-		fTarget= target;
-	}
+    private final List<FrameworkMethod> afters;
 
-	@Override
-	public void evaluate() throws Throwable {
-		List<Throwable> errors = new ArrayList<Throwable>();
-		errors.clear();
-		try {
-			fNext.evaluate();
-		} catch (Throwable e) {
-			errors.add(e);
-		} finally {
-			for (FrameworkMethod each : fAfters)
-				try {
-					each.invokeExplosively(fTarget);
-				} catch (Throwable e) {
-					errors.add(e);
-				}
-		}
-		MultipleFailureException.assertEmpty(errors);
-	}
+    public RunAfters(Statement next, List<FrameworkMethod> afters, Object target) {
+        this.next = next;
+        this.afters = afters;
+        this.target = target;
+    }
+
+    @Override
+    public void evaluate() throws Throwable {
+        List<Throwable> errors = new ArrayList<Throwable>();
+        try {
+            next.evaluate();
+        } catch (Throwable e) {
+            errors.add(e);
+        } finally {
+            for (FrameworkMethod each : afters) {
+                try {
+                    invokeMethod(each);
+                } catch (Throwable e) {
+                    errors.add(e);
+                }
+            }
+        }
+        MultipleFailureException.assertEmpty(errors);
+    }
+
+    /**
+     * @since 4.13
+     */
+    protected void invokeMethod(FrameworkMethod method) throws Throwable {
+        method.invokeExplosively(target);
+    }
 }
