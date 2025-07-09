@@ -64,7 +64,7 @@
 				debug="on"
 				classpath="@{classpath}"
 				includeantruntime="false"
-				target="1.5"
+				target="1.8"
 	  		>
 				<compilerarg value="-Xlint:unchecked" />
 			</javac>
